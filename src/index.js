@@ -1,5 +1,5 @@
 function solveExpression() {
-  var vyraz = document.getElementbyId("Vyraz").value;
+  var vyraz = document.getElementbyId("vyraz").value;
   /*
 
 
@@ -15,7 +15,7 @@ input.addEventListener("keyup", function(event) {
   // zruší výchozí funkci klávesy, pokud nějaká existuje
   event.preventDefault();
   // 13 je hodnota klávesy Enter
-  if (event.keyCode === 13) {
+  if (event.keyCode == 13) {
     solveExpression();
   }
 });
