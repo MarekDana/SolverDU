@@ -17,20 +17,26 @@ function vykonaOperaci(operator, b, a) {
   return 0;
 }
 // vrati false pokud znamenko nema prednost a vrati true pokud ma prednost
-function maPrednost(x, y) {
-  if ((x === "*" || x === "/") && (y === "+" || y === "-")) {
-    return true;
-  } else {
-    return false;
+function hodnotaPriority(x) {
+  switch (x) {
+    case "+":
+      return 1;
+    case "-":
+      return 1;
+    case "/":
+      return 2;
+    case "*":
+      return 2;
   }
+  return 0;
 }
 // vyresi zadany vyraz
 function solveExpression() {
   var vyraz = document.getElementById("vyraz").value;
   for (var x = 0; x < vyraz.length; x++) {
-    if ("/*".includes(vyraz[x].charAt(0)) && x === 0) {
+    if ("/*+-".includes(vyraz[x].charAt(0)) && x === 0) {
       document.getElementById("vysledek").innerHTML =
-        "Neplatný výraz, nelze začít výraz znaménkem / nebo *";
+        "Neplatný výraz, nelze začít výraz znaménkem";
       return;
     }
     if (!"0123456789+-/*".includes(vyraz[x].charAt(0))) {
@@ -53,24 +59,24 @@ function solveExpression() {
     else if ("+-*/".includes(vyraz[z].charAt(0))) {
       cisla.push(cislice);
       cislice = 0;
-
       if (operatory.length === 0) {
         operatory.push(vyraz[z].charAt(0));
-      } else if (
-        operatory.length !== 0 &&
-        maPrednost(operatory[operatory.length - 1], vyraz[z].charAt(0))
-      ) {
-        cisla.push(vykonaOperaci(operatory.pop(), cisla.pop(), cisla.pop()));
-        operatory.push(vyraz[z].charAt(0));
-      } else if (
-        operatory.length !== 0 &&
-        !maPrednost(operatory[operatory.length - 1], vyraz[z].charAt(0))
-      ) {
-        operatory.push(vyraz[z].charAt(0));
+      } else if (operatory.length !== 0) {
+        if (
+          hodnotaPriority(operatory[operatory.length - 1]) <
+          hodnotaPriority(vyraz[z].charAt(0))
+        ) {
+          operatory.push(vyraz[z].charAt(0));
+        } else if (
+          hodnotaPriority(operatory[operatory.length - 1]) >=
+          hodnotaPriority(vyraz[z].charAt(0))
+        ) {
+          cisla.push(vykonaOperaci(operatory.pop(), cisla.pop(), cisla.pop()));
+          operatory.push(vyraz[z].charAt(0));
+        }
       }
     }
   }
-
   cisla.push(cislice);
   while (operatory.length !== 0) {
     cisla.push(vykonaOperaci(operatory.pop(), cisla.pop(), cisla.pop()));
