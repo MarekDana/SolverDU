@@ -67,7 +67,9 @@ function solveExpression() {
           hodnotaPriority(vyraz[z].charAt(0))
         ) {
           operatory.push(vyraz[z].charAt(0));
-        } else if (
+        }
+        // měl by být while cyklus ten ale nefunguje
+        else if (
           hodnotaPriority(operatory[operatory.length - 1]) >=
           hodnotaPriority(vyraz[z].charAt(0))
         ) {
@@ -78,6 +80,11 @@ function solveExpression() {
     }
   }
   cisla.push(cislice);
+  console.log(operatory[operatory.length - 1]);
+  console.log(operatory[operatory.length - 2]);
+  console.log(cisla[cisla.length - 1]);
+  console.log(cisla[cisla.length - 2]);
+  console.log(cisla[cisla.length - 3]);
   while (operatory.length !== 0) {
     cisla.push(vykonaOperaci(operatory.pop(), cisla.pop(), cisla.pop()));
   }
