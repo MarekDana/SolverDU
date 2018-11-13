@@ -3,20 +3,16 @@ function vykonaOperaci(operator, b, a) {
   switch (operator) {
     case "+":
       return a + b;
-      break;
     case "-":
       return a - b;
-      break;
     case "*":
       return a * b;
-      break;
     case "/":
       return a / b;
-      break;
   }
   return 0;
 }
-// vrati false pokud znamenko nema prednost a vrati true pokud ma prednost
+// funkce, která vrátí hodnotu příslušnou znaménku
 function hodnotaPriority(x) {
   switch (x) {
     case "+":
@@ -34,13 +30,30 @@ function hodnotaPriority(x) {
 function solveExpression() {
   var vyraz = document.getElementById("vyraz").value;
   for (var x = 0; x < vyraz.length; x++) {
-    if ("/*+-".includes(vyraz[x].charAt(0)) && x === 0) {
+    // podmínka, která zkontroluje zda výraz obsahuje pouze povolené znaky
+    if (!"0123456789+-/*".includes(vyraz[x].charAt(0))) {
       document.getElementById("vysledek").innerHTML =
-        "Neplatný výraz, nelze začít výraz znaménkem";
+        "Výraz je neplatný, obsahuje neplatné znaky";
       return;
     }
-    if (!"0123456789+-/*".includes(vyraz[x].charAt(0))) {
-      document.getElementById("vysledek").innerHTML = "Výraz je neplatný";
+    // podmínka, která zkontroluje zda výraz nezačiná znaménkem / nebo *
+    if ("/*".includes(vyraz[0].charAt(0))) {
+      document.getElementById("vysledek").innerHTML =
+        "Neplatný výraz, nelze začít výraz znaménkem / nebo *";
+      return;
+    }
+    // podmínka, která zkontroluje zda výraz nekončí znaménkem
+    if ("/*+-".includes(vyraz[vyraz.length - 1].charAt(0))) {
+      document.getElementById("vysledek").innerHTML =
+        "Neplatný výraz, nelze zakončit výraz znaménkem";
+      return;
+    } // podmínka, která zkontroluje zda výraz nemá 2 znaménka vedle sebe
+    if (
+      "/*+-".includes(vyraz[x].charAt(0)) &&
+      "/*+-".includes(vyraz[x + 1].charAt(0))
+    ) {
+      document.getElementById("vysledek").innerHTML =
+        "Výraz je neplatný, po znaménku musí následovat číslo";
       return;
     }
   }
@@ -54,8 +67,7 @@ function solveExpression() {
       cislice *= 10;
       cislice += parseInt(vyraz[z], 10);
     }
-
-    // pokud je znak znamenko
+    // pokud je znak znaménko
     else if ("+-*/".includes(vyraz[z].charAt(0))) {
       cisla.push(cislice);
       cislice = 0;
@@ -67,30 +79,34 @@ function solveExpression() {
           hodnotaPriority(vyraz[z].charAt(0))
         ) {
           operatory.push(vyraz[z].charAt(0));
-        }
-        // měl by být while cyklus ten ale nefunguje
-        else if (
+        } else if (
           hodnotaPriority(operatory[operatory.length - 1]) >=
           hodnotaPriority(vyraz[z].charAt(0))
         ) {
-          cisla.push(vykonaOperaci(operatory.pop(), cisla.pop(), cisla.pop()));
+          while (
+            hodnotaPriority(operatory[operatory.length - 1]) >=
+            hodnotaPriority(vyraz[z].charAt(0))
+          ) {
+            cisla.push(
+              vykonaOperaci(operatory.pop(), cisla.pop(), cisla.pop())
+            );
+          }
           operatory.push(vyraz[z].charAt(0));
         }
       }
     }
   }
   cisla.push(cislice);
-  console.log(operatory[operatory.length - 1]);
-  console.log(operatory[operatory.length - 2]);
-  console.log(cisla[cisla.length - 1]);
-  console.log(cisla[cisla.length - 2]);
-  console.log(cisla[cisla.length - 3]);
   while (operatory.length !== 0) {
     cisla.push(vykonaOperaci(operatory.pop(), cisla.pop(), cisla.pop()));
   }
-
   vysledek = cisla.pop();
-  document.getElementById("vysledek").innerHTML = "Vysledek je " + vysledek;
+  // vysledek === +-Infinity nastane jen v případě, že se dělí nulou
+  if (vysledek === Infinity || vysledek === -Infinity) {
+    document.getElementById("vysledek").innerHTML = "Nulou nelze dělit";
+  } else {
+    document.getElementById("vysledek").innerHTML = "Výsledek je " + vysledek;
+  }
 }
 
 var input = document.getElementById("vyraz");
